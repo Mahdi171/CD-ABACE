@@ -1,9 +1,4 @@
-from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
-from charm.toolbox.secretutil import SecretUtil
-from charm.toolbox.ABEnc import ABEnc, Input, Output
-from collections import defaultdict
-from Zeropoly import Zero_poly
-from Main import CPabe_SP21
+from charm.toolbox.pairinggroup import PairingGroup
 # type annotations'
 groupObj = PairingGroup('SS512')
 cpabe = CPabe_SP21(groupObj)
