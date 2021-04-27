@@ -3,7 +3,7 @@
 ## About The Project
 This repository is created to share the code of a recently constant key and constant ciphertext size Cross-Domain Attribute-Based Access Control Encryption scheme proposed by Sedaghat and Preneel in [[1]](#1) (Sect. 7). 
 
-The code is written in python under [charm-crypto](https://github.com/iulianiosep/charm-crypto) library. 
+The code is written in python under [charm-crypto](https://github.com/JHUISI/charm) library. 
 
 ## References
 <a id="1">[1]</a> Sedaghat, Mahdi, and Bart Preneel, 
