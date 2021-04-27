@@ -37,8 +37,8 @@ class CPabe_SP21(ABEnc):
     @Input(pk_t)
     @Output(sgk_t)
     def SAgen(self, pk):
-        v=group.random(ZR); Y=group.random(G2)
-        V= pk['g_2'] ** v
+        v = group.random(ZR); Y = group.random(G2)
+        V = pk['g_2'] ** v
         sgk = {'v':v}
         vk = {'vk':V, 'Y':Y}
         return (sgk, vk)
@@ -63,13 +63,13 @@ class CPabe_SP21(ABEnc):
         Coeffs=list(reversed(coeff_mult))
         for i in range(len(indices)):
             Ek*= (pk['h_i'][i+1] ** Coeffs[i])
-        ek={ 'ek':Ek }
-        t=group.random(ZR)
+        ek = {'ek':Ek}
+        t = group.random(ZR)
         R = pk['g_2']**t
         S = (Ek ** (sgk['v']/t)) * (vk['Y']**(1/t))
         T = (S ** (sgk['v']/t)) * (pk['h_i'][0]**(1/t))
         W = pk['h_i'][0]**(1/t)
-        sign={ 'R':R, 'S':S, 'T':T, 'W':W }
+        sign={'R':R, 'S':S, 'T':T, 'W':W}
         return (ek,sign)
 
     @Input(pk_t, vk_t, GT, ek_t, sign_t, [str])
@@ -96,15 +96,15 @@ class CPabe_SP21(ABEnc):
     @Input(pk_t, vk_t, ct_t, Rand_t)
     @Output(ctt_t)
     def Sanitization(self, pk, vk, ct, Rand):
-        a=[]; C2prime=1; s=group.random(ZR)
+        a = []; C2prime = 1; s = group.random(ZR)
         if pair(Rand['Rprime'],Rand['Sprime'])==pair(Rand['vkprime'],Rand['ekprime'])*pair(pk['g_2'],vk['Y']) and pair(Rand['Rprime'],Rand['Tprime'])==pair(vk['vk'],Rand['Sprime'])*pair(pk['g_2'],pk['h_i'][0]):
-            Com_set= list(set(pk['uni']) - set(ct['policy']))
+            Com_set = list(set(pk['uni']) - set(ct['policy']))
             for attrs in Com_set:
                 a.append(group.hash(attrs, ZR))
-            (indices,coeff_mult)=Zero_poly(a,len(a)-1,[0],[1])
-            Coeffs=list(reversed(coeff_mult))
+            (indices,coeff_mult) = Zero_poly(a,len(a)-1,[0],[1])
+            Coeffs = list(reversed(coeff_mult))
             for i in range(len(indices)):
-                C2prime*= (pk['h_i'][i+1] ** Coeffs[i])
+                C2prime *= (pk['h_i'][i+1] ** Coeffs[i])
             Cprime = ct['C'] * (pk['e_gg_alpha']**s)
             C1prime = ct['C1'] * (pk['g_2']**(-s))
             C2prime = ct['C2'] * (C2prime**s)
@@ -116,13 +116,13 @@ class CPabe_SP21(ABEnc):
     @Input(pk_t, sk_t, ctt_t)
     @Output(GT)
     def decrypt(self, pk, sk, ctt):
-        A=list(set(sk['B'])-set(ctt['policy']))
-        a=[]; z=1
+        A = list(set(sk['B'])-set(ctt['policy']))
+        a = []; z = 1
         for attrs in A:
             a.append(group.hash(attrs, ZR))
-        (indices,coeff_mult)=Zero_poly(a,len(a)-1,[0],[1])
-        Coeffs=list(reversed(coeff_mult))
+        (indices,coeff_mult) = Zero_poly(a,len(a)-1,[0],[1])
+        Coeffs = list(reversed(coeff_mult))
         for i in range(len(indices)-1):
-            z*= pk['h_i'][i] ** Coeffs[i+1]
-        V=(pair(ctt['C1prime'],z) * pair(sk['dk'],ctt['C2prime']))
+            z *= pk['h_i'][i] ** Coeffs[i+1]
+        V = (pair(ctt['C1prime'],z) * pair(sk['dk'],ctt['C2prime']))
         return ctt['Cprime'] * (V**(-1/Coeffs[0]))
