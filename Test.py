@@ -5,7 +5,7 @@ from collections import defaultdict
 from Zeropoly import Zero_poly
 from Main import CPabe_SP21
 # type annotations'
-groupObj = PairingGroup('SS512')
+groupObj = PairingGroup('/home/mahdi/Desktop/pbc-0.5.14/param/f.param', param_file=True)
 cpabe = CPabe_SP21(groupObj)
 
 
