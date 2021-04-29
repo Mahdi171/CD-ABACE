@@ -90,8 +90,6 @@ class CPabe_SP21(ABEnc):
         Rand = { 'Rprime':Rprime, 'Sprime':Sprime, 'Tprime':Tprime, 'Wprime':Wprime, 'vkprime': vkprime, 'ekprime':ekprime}
         return (ct,Rand)
     
-    
-    
 
     @Input(pk_t, vk_t, ct_t, Rand_t)
     @Output(ctt_t)
