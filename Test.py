@@ -1,6 +1,6 @@
 from charm.toolbox.pairinggroup import PairingGroup
 # type annotations'
-groupObj = PairingGroup('SS512')
+groupObj = PairingGroup('/home/mahdi/Desktop/pbc-0.5.14/param/f.param', param_file=True)
 cpabe = CPabe_SP21(groupObj)
 
 
