@@ -2,6 +2,8 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc, Input, Output
 from Zeropoly import Zero_poly
+from openpyxl import load_workbook
+from openpyxl import Workbook
 
 pk_t = { 'g_2':G1, 'h_i':G2, 'e_gg_alpha':GT, 'uni': str}
 mk_t = {'alpha':ZR, 'g':G1 }
@@ -125,3 +127,78 @@ class CPabe_SP21(ABEnc):
         V = (pair(ctt['C1prime'],z) * pair(sk['dk'],ctt['C2prime']))
         return ctt['Cprime'] * (V**(-1/Coeffs[0]))
 
+
+
+def start_bench(group):
+    group.InitBenchmark()
+    group.StartBenchmark(["RealTime"])
+
+def end_bench(group):
+    group.EndBenchmark()
+    benchmarks = group.GetGeneralBenchmarks()
+    real_time = benchmarks['RealTime']
+    return real_time
+
+
+groupObj = PairingGroup('BN254')
+cpabe = CPabe_SP21(groupObj)
+
+def run_round_trip(n):
+    result=[n]
+    # RA setup
+    U = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN'] * n
+    start_bench(groupObj)
+    (pk, mk) = cpabe.RAgen(len(U), U)
+    Setup_time = end_bench(groupObj)
+    result.append(Setup_time)
+
+    # SA setup
+    start_bench(groupObj)
+    (sgk,vk) = cpabe.SAgen(pk)
+    SA_time = end_bench(groupObj)
+    result.append(SA_time)
+
+    # Encryption key generation
+    P = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE']*n
+    start_bench(groupObj)
+    (ek,sign) = cpabe.EncKGen(pk, sgk, vk, P, U)
+    EncKGen_time = end_bench(groupObj)
+    result.append(EncKGen_time)
+
+    # Decryption key generation
+    B = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX']*n
+    start_bench(groupObj)
+    dk = cpabe.DecKGen(pk, mk, B, U)
+    DecKGen_time = end_bench(groupObj)
+    result.append(DecKGen_time)
+
+    # Encryption
+    rand_msg = groupObj.random(GT)
+    start_bench(groupObj)
+    (ct, Rand) = cpabe.encrypt(pk, vk, rand_msg, ek, sign, P)
+    encrypt_time = end_bench(groupObj)
+    result.append(encrypt_time)
+
+    # Sanitization
+    start_bench(groupObj)
+    (ctt) = cpabe.Sanitization(pk, vk, ct, Rand)
+    Sanitization_time = end_bench(groupObj)
+    result.append(Sanitization_time)
+
+    # Decryption
+    start_bench(groupObj)
+    rec_msg = cpabe.decrypt(pk, dk, ctt)
+    decrypt_time = end_bench(groupObj)
+    result.append(decrypt_time)
+    return result
+
+book=Workbook()
+data=book.active
+title=["n","setup_time","SA_time", "EncKGen_time","DecKGen_time","encrypt_time","Sanitize_time","Decryption_time"]
+data.append(title)
+
+for n in range(1,100):
+    data.append(run_round_trip(n))
+    print(n)
+
+book.save("Result.xlsx")
