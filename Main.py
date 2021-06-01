@@ -2,6 +2,7 @@ from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.toolbox.secretutil import SecretUtil
 from charm.toolbox.ABEnc import ABEnc, Input, Output
 from Zeropoly import Zero_poly
+from PoK import PoK
 
 pk_t = { 'g_2':G1, 'h_i':G2, 'e_gg_alpha':GT, 'uni': str}
 mk_t = {'alpha':ZR, 'g':G1 }
